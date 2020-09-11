@@ -3,13 +3,23 @@ package main
 import (
 	"fmt"
 	"github.com/kataras/iris/v12"
-	"net/http"
 	"time"
 )
 
+type Info struct {
+	ID   int64  `json:"id"`
+	City string `json:"city"`
+}
+
+type User struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+	Info Info
+}
+
 func main() {
 	app := iris.New()
-	app.Get("/", func(ctx iris.Context){
+	app.Get("/", func(ctx iris.Context) {
 		ctx.WriteString("Hello Iris [GET]")
 	})
 	app.Post("/", func(ctx iris.Context) {
@@ -21,7 +31,33 @@ func main() {
 		ctx.WriteString("Hello World [GET]")
 	})
 
-	app.Handle(http.MethodGet, "/region-list", httpGetRegionList)
+	app.Post("/json", func(ctx iris.Context) {
+		var user User
+		ctx.ReadJSON(&user)
+		fmt.Printf("[POST] %v", user)
+
+		yujinB := User{
+			Name: "Yujin B",
+			Age:  14,
+			Info: Info{
+				ID:   7,
+				City: "April",
+			},
+		}
+		ctx.JSON(yujinB)
+	})
+
+	app.Get("/json", func(ctx iris.Context) {
+		yujinA := User{
+			Name: "Yujin A",
+			Age:  14,
+			Info: Info{
+				ID:   7,
+				City: "April",
+			},
+		}
+		ctx.JSON(yujinA)
+	})
 
 	app.Run(iris.Addr(":8085"), iris.WithCharset("UTF-8"))
 
@@ -29,10 +65,3 @@ func main() {
 		time.Sleep(time.Hour)
 	}
 }
-
-func httpGetRegionList(ctx iris.Context) {
-	output := "output string"
-	fmt.Printf("GET")
-	_, _ = ctx.WriteString(output)
-}
-

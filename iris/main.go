@@ -19,18 +19,23 @@ type User struct {
 
 func main() {
 	app := iris.New()
+
+	// GET /
 	app.Get("/", func(ctx iris.Context) {
 		ctx.WriteString("Hello Iris [GET]")
 	})
+	// POST /
 	app.Post("/", func(ctx iris.Context) {
 		ctx.Write([]byte("Hello Iris [POST]"))
 	})
 
+	// GET /hello/world
 	helloParty := app.Party("/hello")
 	helloParty.Get("/world", func(ctx iris.Context) {
 		ctx.WriteString("Hello World [GET]")
 	})
 
+	// POST /json
 	app.Post("/json", func(ctx iris.Context) {
 		var user User
 		ctx.ReadJSON(&user)
@@ -47,6 +52,7 @@ func main() {
 		ctx.JSON(yujinB)
 	})
 
+	// GET /json
 	app.Get("/json", func(ctx iris.Context) {
 		yujinA := User{
 			Name: "Yujin A",
@@ -57,6 +63,12 @@ func main() {
 			},
 		}
 		ctx.JSON(yujinA)
+	})
+
+	// GET /url-param
+	app.Get("/url-param", func(ctx iris.Context) {
+		db := ctx.URLParam("db")
+		fmt.Println("param:", db)
 	})
 
 	app.Run(iris.Addr(":8085"), iris.WithCharset("UTF-8"))

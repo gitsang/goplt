@@ -20,9 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="745d9f7d-2001-4842-be15-f418ac37413d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../json/.idea/json.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../json/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../json/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../json/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -68,7 +70,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
-  <component name="RunManager" selected="Go Build.go build v2/test">
+  <component name="RunManager" selected="Go Build.go build main.go">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="iris_test" />
       <working_directory value="$PROJECT_DIR$" />
@@ -118,8 +120,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build v2/test" />
         <item itemvalue="Go Build.go build main.go" />
+        <item itemvalue="Go Build.go build v2/test" />
         <item itemvalue="Go Build.go build v2/example" />
       </list>
     </recent_temporary>
@@ -138,6 +140,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -151,22 +154,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="274" key="FileChooserDialogImpl/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1599805600979" />
-    <state width="1877" height="281" key="GridCell.Tab.0.bottom" timestamp="1599817103955">
+    <state width="1877" height="281" key="GridCell.Tab.0.bottom" timestamp="1600827822654">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="281" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1599817103955" />
-    <state width="1877" height="281" key="GridCell.Tab.0.center" timestamp="1599817103955">
+    <state width="1877" height="281" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1600827822654" />
+    <state width="1877" height="281" key="GridCell.Tab.0.center" timestamp="1600827822654">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="281" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1599817103955" />
-    <state width="1877" height="281" key="GridCell.Tab.0.left" timestamp="1599817103955">
+    <state width="1877" height="281" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1600827822654" />
+    <state width="1877" height="281" key="GridCell.Tab.0.left" timestamp="1600827822654">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="281" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1599817103955" />
-    <state width="1877" height="281" key="GridCell.Tab.0.right" timestamp="1599817103955">
+    <state width="1877" height="281" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1600827822654" />
+    <state width="1877" height="281" key="GridCell.Tab.0.right" timestamp="1600827822654">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="281" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1599817103955" />
+    <state width="1877" height="281" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1600827822654" />
     <state x="461" y="164" key="SettingsEditor" timestamp="1599804025045">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

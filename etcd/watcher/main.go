@@ -33,19 +33,21 @@ func main() {
 
 	k := "/sang/key"
 
-	go func() {
-		w := cli.Watch(context.Background(), "", etcd3.WithPrefix())
-		for resp := range w {
-			for _, e := range resp.Events {
-				log.Info("watch", zap.Any("type", e.Type))
-			}
-		}
-	}()
+	// Watcher
+	//go func() {
+	//	w := cli.Watch(context.Background(), "", etcd3.WithPrefix())
+	//	for resp := range w {
+	//		for _, e := range resp.Events {
+	//			log.Info("watch", zap.Any("type", e.Type))
+	//		}
+	//	}
+	//}()
 
 	for {
+		// PUT
 		{
 			v := "value-" + utils.RandomString(5)
-			resp, err := cli.Put(context.TODO(), k, v, etcd3.WithPrevKV())
+			resp, err := cli.Put(context.Background(), k, v, etcd3.WithPrevKV())
 			if err != nil {
 				log.Error(zap.Error(err))
 			} else {
@@ -53,12 +55,14 @@ func main() {
 			}
 		}
 
+		// GET
 		{
-			resp, err := cli.Get(context.TODO(), k)
+			resp, err := cli.Get(context.Background(), k,
+				etcd3.WithPrefix(), etcd3.WithSerializable())
 			if err != nil {
 				log.Error(zap.Error(err))
 			} else {
-				log.Info(zap.Any("version", resp.Kvs[0].Version))
+				log.Info(zap.Any("Kvs", resp.Kvs))
 			}
 		}
 		time.Sleep(5 * time.Second)

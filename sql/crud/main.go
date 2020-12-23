@@ -17,12 +17,12 @@ const (
 	RegionGlobal   = "global"
 	Username       = "root"
 	Password       = ""
-	ShanghaiHost   = "10.200.112.223"
-	ShenzhenHost   = "10.200.112.107"
-	GlobalHost     = "10.200.112.212"
+	ShanghaiHost   = "tidb-cn.l7i.top"
+	ShenzhenHost   = "tidb-us.l7i.top"
+	GlobalHost     = "tidb-global.l7i.top"
 	DbHookPort     = 9436
-	DataBase       = "csh"
-	Table          = "tb"
+	DataBase       = "sang"
+	Table          = "tab2"
 	Network        = "tcp"
 )
 

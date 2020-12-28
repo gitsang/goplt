@@ -18,6 +18,42 @@ const (
 	Network    = "tcp"
 )
 
+var cfg = Config{
+	Databases: []*Database{
+		{
+			Name: "sang2",
+			Init: true,
+			Tables: []*Table{
+				{ Name: "tab1", Cnt:1000, Init: true},
+				{ Name: "tab2", Cnt:1000, Init: true},
+				{ Name: "tab3", Cnt:1000, Init: true},
+				{ Name: "tab4", Cnt:1000, Init: true},
+				{ Name: "tab5", Cnt:1000, Init: true},
+				{ Name: "tab6", Cnt:1000, Init: true},
+				{ Name: "tab7", Cnt:1000, Init: true},
+				{ Name: "tab8", Cnt:1000, Init: true},
+				{ Name: "tab9", Cnt:1000, Init: true},
+			},
+		},
+	},
+}
+
+type Table struct {
+	Name string
+	Init bool
+	Cnt  int
+}
+
+type Database struct {
+	Name   string
+	Init   bool
+	Tables []*Table
+}
+
+type Config struct {
+	Databases []*Database
+}
+
 func dbConn(username, password, network, dbhost, dbport, database string) (*sql.DB, error) {
 	src := fmt.Sprintf("%s:%s@%s(%s:%s)/%s", username, password, network, dbhost, dbport, database)
 	db, err := sql.Open("mysql", src)
@@ -138,23 +174,26 @@ func main() {
 		return
 	}
 
-	{ // db: sang
-		dbname := "sang"
-		err = initDb(cnDb, dbname)
-		if err != nil {
-			return
+	for _, db := range cfg.Databases {
+		dbname := db.Name
+		if db.Init {
+			err = initDb(cnDb, dbname)
+			if err != nil {
+				return
+			}
+			err = initDb(usDb, dbname)
+			if err != nil {
+				return
+			}
+			err = initDb(ggDb, dbname)
+			if err != nil {
+				return
+			}
 		}
-		err = initDb(usDb, dbname)
-		if err != nil {
-			return
-		}
-		err = initDb(ggDb, dbname)
-		if err != nil {
-			return
-		}
-		{ // tab1
-			tabname := "tab1"
-			{ // init table
+		for _, tab := range db.Tables {
+			tabname := tab.Name
+			cnt := tab.Cnt
+			if tab.Init {
 				err = initTable(cnDb, dbname, tabname)
 				if err != nil {
 					return
@@ -169,124 +208,11 @@ func main() {
 				}
 			}
 			{ // insert data
-				err = insert(cnDb, dbname, tabname, 10000, 1000, "cn")
+				err = insert(cnDb, dbname, tabname, 100000000, cnt, "cn")
 				if err != nil {
 					return
 				}
-				err = insert(usDb, dbname, tabname, 20000, 1000, "us")
-				if err != nil {
-					return
-				}
-				err = insert(ggDb, dbname, tabname, 30000, 1000, "gg")
-				if err != nil {
-					return
-				}
-			}
-		}
-		{ // tab2
-			tabname := "tab2"
-			{ // init table
-				err = initTable(cnDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-				err = initTable(usDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-				err = initTable(ggDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-			}
-			{ // insert data
-				err = insert(cnDb, dbname, tabname, 10000, 1000, "cn")
-				if err != nil {
-					return
-				}
-				err = insert(usDb, dbname, tabname, 20000, 1000, "us")
-				if err != nil {
-					return
-				}
-				err = insert(ggDb, dbname, tabname, 30000, 1000, "gg")
-				if err != nil {
-					return
-				}
-			}
-		}
-	}
-
-	{ // db: sang
-		dbname := "sang1"
-		err = initDb(cnDb, dbname)
-		if err != nil {
-			return
-		}
-		err = initDb(usDb, dbname)
-		if err != nil {
-			return
-		}
-		err = initDb(ggDb, dbname)
-		if err != nil {
-			return
-		}
-		{ // tab1
-			tabname := "tab1"
-			{ // init table
-				err = initTable(cnDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-				err = initTable(usDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-				err = initTable(ggDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-			}
-			{ // insert data
-				err = insert(cnDb, dbname, tabname, 10000, 1000, "cn")
-				if err != nil {
-					return
-				}
-				err = insert(usDb, dbname, tabname, 20000, 1000, "us")
-				if err != nil {
-					return
-				}
-				err = insert(ggDb, dbname, tabname, 30000, 1000, "gg")
-				if err != nil {
-					return
-				}
-			}
-		}
-		{ // tab2
-			tabname := "tab2"
-			{ // init table
-				err = initTable(cnDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-				err = initTable(usDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-				err = initTable(ggDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-			}
-			{ // insert data
-				err = insert(cnDb, dbname, tabname, 10000, 1000, "cn")
-				if err != nil {
-					return
-				}
-				err = insert(usDb, dbname, tabname, 20000, 1000, "us")
-				if err != nil {
-					return
-				}
-				err = insert(ggDb, dbname, tabname, 30000, 1000, "gg")
+				err = insert(usDb, dbname, tabname, 200000000, cnt, "us")
 				if err != nil {
 					return
 				}

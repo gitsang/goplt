@@ -16,23 +16,42 @@ const (
 	GlobalDb   = "tidb-global.l7i.top"
 	DbHookPort = "9436"
 	Network    = "tcp"
+
+	CNStart = 100000000
+	USStart = 200000000
 )
 
 var cfg = Config{
 	Databases: []*Database{
 		{
+			Name: "sang",
+			Init: true,
+			Tables: []*Table{
+				{Name: "tab1", Cnt: 5000, Init: true},
+				{Name: "tab2", Cnt: 5000, Init: true},
+			},
+		},
+		{
+			Name: "sang1",
+			Init: true,
+			Tables: []*Table{
+				{Name: "tab1", Cnt: 5000, Init: true},
+				{Name: "tab2", Cnt: 5000, Init: true},
+			},
+		},
+		{
 			Name: "sang2",
 			Init: true,
 			Tables: []*Table{
-				{ Name: "tab1", Cnt:1000, Init: true},
-				{ Name: "tab2", Cnt:1000, Init: true},
-				{ Name: "tab3", Cnt:1000, Init: true},
-				{ Name: "tab4", Cnt:1000, Init: true},
-				{ Name: "tab5", Cnt:1000, Init: true},
-				{ Name: "tab6", Cnt:1000, Init: true},
-				{ Name: "tab7", Cnt:1000, Init: true},
-				{ Name: "tab8", Cnt:1000, Init: true},
-				{ Name: "tab9", Cnt:1000, Init: true},
+				{Name: "tab1", Cnt: 0, Init: true},
+				{Name: "tab2", Cnt: 0, Init: true},
+				{Name: "tab3", Cnt: 0, Init: true},
+				{Name: "tab4", Cnt: 0, Init: true},
+				{Name: "tab5", Cnt: 0, Init: true},
+				{Name: "tab6", Cnt: 0, Init: true},
+				{Name: "tab7", Cnt: 0, Init: true},
+				{Name: "tab8", Cnt: 0, Init: true},
+				{Name: "tab9", Cnt: 0, Init: true},
 			},
 		},
 	},
@@ -128,8 +147,27 @@ func insert(db *sql.DB, dbname, tabname string, start, len int, content string) 
 			log.Error("insert exec error", zap.Error(err))
 			return err
 		}
-		log.Info("insert", zap.Any("i", i), zap.Any("content", content), zap.Any("db", dbname), zap.Any("tab", tabname))
+		log.Info("insert", zap.Any("i", i), zap.Any("content", content),
+			zap.Any("db", dbname), zap.Any("tab", tabname))
 	}
+
+	return nil
+}
+
+func Delete(db *sql.DB, dbname, tabname string, start, end int) error {
+	deleteSql := fmt.Sprintf("delete from %s.%s where id >= %d and id <= %d", dbname, tabname, start, end)
+	stmt, err := db.Prepare(deleteSql)
+	if err != nil {
+		log.Error("delete prepare error", zap.Error(err))
+		return err
+	}
+
+	_, err = stmt.Exec()
+	if err != nil {
+		log.Error("delete exec error", zap.Error(err))
+		return err
+	}
+	log.Info("delete", zap.Any("db", dbname), zap.Any("tab", tabname))
 
 	return nil
 }
@@ -174,45 +212,64 @@ func main() {
 		return
 	}
 
-	for _, db := range cfg.Databases {
-		dbname := db.Name
-		if db.Init {
-			err = initDb(cnDb, dbname)
-			if err != nil {
-				return
+	if true {
+		for _, db := range cfg.Databases {
+			dbname := db.Name
+			if db.Init {
+				err = initDb(cnDb, dbname)
+				if err != nil {
+					return
+				}
+				err = initDb(usDb, dbname)
+				if err != nil {
+					return
+				}
+				err = initDb(ggDb, dbname)
+				if err != nil {
+					return
+				}
 			}
-			err = initDb(usDb, dbname)
-			if err != nil {
-				return
-			}
-			err = initDb(ggDb, dbname)
-			if err != nil {
-				return
+			for _, tab := range db.Tables {
+				tabname := tab.Name
+				cnt := tab.Cnt
+				if tab.Init {
+					err = initTable(cnDb, dbname, tabname)
+					if err != nil {
+						return
+					}
+					err = initTable(usDb, dbname, tabname)
+					if err != nil {
+						return
+					}
+					err = initTable(ggDb, dbname, tabname)
+					if err != nil {
+						return
+					}
+				}
+				{ // insert data
+					err = insert(cnDb, dbname, tabname, CNStart, cnt, "cn")
+					if err != nil {
+						return
+					}
+					err = insert(usDb, dbname, tabname, USStart, cnt, "us")
+					if err != nil {
+						return
+					}
+				}
 			}
 		}
-		for _, tab := range db.Tables {
-			tabname := tab.Name
-			cnt := tab.Cnt
-			if tab.Init {
-				err = initTable(cnDb, dbname, tabname)
+	}
+
+	if false {
+		for _, db := range cfg.Databases {
+			dbname := db.Name
+			for _, tab := range db.Tables {
+				tabname := tab.Name
+				err = Delete(cnDb, dbname, tabname, CNStart, CNStart + 100)
 				if err != nil {
 					return
 				}
-				err = initTable(usDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-				err = initTable(ggDb, dbname, tabname)
-				if err != nil {
-					return
-				}
-			}
-			{ // insert data
-				err = insert(cnDb, dbname, tabname, 100000000, cnt, "cn")
-				if err != nil {
-					return
-				}
-				err = insert(usDb, dbname, tabname, 200000000, cnt, "us")
+				err = Delete(usDb, dbname, tabname, USStart, USStart + 100)
 				if err != nil {
 					return
 				}

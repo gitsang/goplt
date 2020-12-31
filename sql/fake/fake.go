@@ -39,21 +39,6 @@ var cfg = Config{
 				{Name: "tab2", Cnt: 5000, Init: true},
 			},
 		},
-		{
-			Name: "sang2",
-			Init: true,
-			Tables: []*Table{
-				{Name: "tab1", Cnt: 0, Init: true},
-				{Name: "tab2", Cnt: 0, Init: true},
-				{Name: "tab3", Cnt: 0, Init: true},
-				{Name: "tab4", Cnt: 0, Init: true},
-				{Name: "tab5", Cnt: 0, Init: true},
-				{Name: "tab6", Cnt: 0, Init: true},
-				{Name: "tab7", Cnt: 0, Init: true},
-				{Name: "tab8", Cnt: 0, Init: true},
-				{Name: "tab9", Cnt: 0, Init: true},
-			},
-		},
 	},
 }
 

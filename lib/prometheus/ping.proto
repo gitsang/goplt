@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package prometheus;
+
+service PingPong {
+  rpc Ping (PingMsg) returns (PongMsg) {}
+}
+
+message PingMsg {
+  string message = 1;
+}
+
+message PongMsg {
+  string message = 1;
+}
+

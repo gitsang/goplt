@@ -1,4 +1,4 @@
-package main
+package test
 
 func IsPalindrome(s string) bool {
 	for i := range s {

@@ -25,20 +25,19 @@ var cfg = Config{
 	Databases: []*Database{
 		{
 			Name: "sang",
-			Init: true,
+			Init: false,
 			Tables: []*Table{
-				{Name: "tab1", Cnt: 5000, Init: true},
-				{Name: "tab2", Cnt: 5000, Init: true},
+				{Name: "tab3", Cnt: 1, Init: true},
 			},
 		},
-		{
-			Name: "sang1",
-			Init: true,
-			Tables: []*Table{
-				{Name: "tab1", Cnt: 5000, Init: true},
-				{Name: "tab2", Cnt: 5000, Init: true},
-			},
-		},
+		//{
+		//	Name: "sang1",
+		//	Init: true,
+		//	Tables: []*Table{
+		//		{Name: "tab1", Cnt: 5000, Init: true},
+		//		{Name: "tab2", Cnt: 5000, Init: true},
+		//	},
+		//},
 	},
 }
 

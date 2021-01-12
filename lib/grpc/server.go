@@ -21,7 +21,7 @@ package main
 //go:generate protoc -I ../helloworld --go_out=plugins=grpc:../helloworld ../helloworld/helloworld.proto
  
 import (
-    "log"
+	"log"
     "net"
     "golang.org/x/net/context"
     "google.golang.org/grpc"

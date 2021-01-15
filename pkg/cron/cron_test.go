@@ -14,6 +14,16 @@ import (
 // | Month      | 1-12 or JAN-DEC | * / , -
 // | DayOfWeek  | 0-6 or SUM-SAT  | * / , – ?
 
+func TestCronSec(t *testing.T) {
+	c := cron.New()
+	_ = c.AddFunc("* * * * *",
+		func() { fmt.Println("every sec", time.Now().Unix()) })
+	c.Start()
+	defer c.Stop()
+
+	select {}
+}
+
 func TestCron(t *testing.T) {
 	c := cron.New()
 	_ = c.AddFunc("0 * * * * *",

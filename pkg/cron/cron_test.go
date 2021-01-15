@@ -35,3 +35,33 @@ func TestCron(t *testing.T) {
 
 	select {}
 }
+
+func TestCronStop(t *testing.T) {
+	c := cron.New()
+	for {
+		c.Stop()
+		c = cron.New()
+		_ = c.AddFunc("* * * * * *", func() {
+			fmt.Println(time.Now().Unix())
+		})
+		t.Log("start begin")
+		c.Start()
+		t.Log("start end")
+		time.Sleep(10 * time.Second)
+	}
+}
+
+func TestCronTrash(t *testing.T) {
+	t.Log(t.Name(), "test start")
+	c := cron.New()
+	for {
+		c.Stop()
+		c = cron.New()
+		for i := 0; i < 100000; i++ {
+			_ = c.AddFunc("0 * * * * *", func() {
+				fmt.Println(time.Now().Unix())
+			})
+		}
+		c.Start()
+	}
+}

@@ -17,7 +17,8 @@ type Config struct {
 }
 
 func TestReflect(t *testing.T) {
-	srcConf := Config{
+	var srcConf *Config
+	srcConf = &Config{
 		ConfigName: "name1",
 		ConfigSize: 1,
 		ConfigBool: false,
@@ -31,7 +32,7 @@ func TestReflect(t *testing.T) {
 	_ = os.Setenv("config_size", strconv.Itoa(dstConf.ConfigSize))
 	_ = os.Setenv("COnfIG_BOoL", strconv.FormatBool(dstConf.ConfigBool))
 
-	elem := reflect.ValueOf(&srcConf).Elem()
+	elem := reflect.ValueOf(srcConf).Elem()
 	for i := 0; i < elem.NumField(); i++ {
 		tag := elem.Type().Field(i).Tag.Get("json")
 		key := strings.ReplaceAll(tag, "-", "_")
@@ -40,16 +41,19 @@ func TestReflect(t *testing.T) {
 		if filed.Type().Kind() == reflect.String {
 			if v := os.Getenv(key); v != "" {
 				filed.Set(reflect.ValueOf(v))
+				t.Log("ConfFromEnv", key, v)
 			}
 		} else if filed.Type().Kind() == reflect.Int {
 			if v := os.Getenv(key); v != "" {
 				vInt, _ := strconv.Atoi(v)
 				filed.Set(reflect.ValueOf(vInt))
+				t.Log("ConfFromEnv", key, v)
 			}
 		} else if filed.Type().Kind() == reflect.Bool {
 			if v := os.Getenv(key); v != "" {
 				vBool, _ := strconv.ParseBool(v)
 				filed.Set(reflect.ValueOf(vBool))
+				t.Log("ConfFromEnv", key, v)
 			}
 		}
 
@@ -70,7 +74,7 @@ func TestReflect(t *testing.T) {
 	}
 	t.Log(srcConf)
 
-	if srcConf != dstConf {
+	if *srcConf != dstConf {
 		t.FailNow()
 	}
 }

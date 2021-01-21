@@ -6,6 +6,7 @@ import (
 	"github.com/gitsang/golog"
 	_ "github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"
+	"sync"
 )
 
 const (
@@ -25,19 +26,30 @@ var cfg = Config{
 	Databases: []*Database{
 		{
 			Name: "sang",
-			Init: false,
+			Init: true,
 			Tables: []*Table{
-				{Name: "tab3", Cnt: 1, Init: true},
+				{Name: "tab01", Cnt: 100, Init: true},
+				{Name: "tab02", Cnt: 100, Init: true},
+				{Name: "tab03", Cnt: 100, Init: true},
+				{Name: "tab04", Cnt: 100, Init: true},
+				{Name: "tab05", Cnt: 100, Init: true},
+				{Name: "tab06", Cnt: 100, Init: true},
+				{Name: "tab07", Cnt: 100, Init: true},
+				{Name: "tab08", Cnt: 100, Init: true},
+				{Name: "tab09", Cnt: 100, Init: true},
+				{Name: "tab10", Cnt: 100, Init: true},
+				{Name: "tab11", Cnt: 100, Init: true},
+				{Name: "tab12", Cnt: 100, Init: true},
+				{Name: "tab13", Cnt: 100, Init: true},
+				{Name: "tab14", Cnt: 100, Init: true},
+				{Name: "tab15", Cnt: 100, Init: true},
+				{Name: "tab16", Cnt: 100, Init: true},
+				{Name: "tab17", Cnt: 100, Init: true},
+				{Name: "tab18", Cnt: 100, Init: true},
+				{Name: "tab19", Cnt: 100, Init: true},
+				{Name: "tab20", Cnt: 100, Init: true},
 			},
 		},
-		//{
-		//	Name: "sang1",
-		//	Init: true,
-		//	Tables: []*Table{
-		//		{Name: "tab1", Cnt: 5000, Init: true},
-		//		{Name: "tab2", Cnt: 5000, Init: true},
-		//	},
-		//},
 	},
 }
 
@@ -213,34 +225,50 @@ func main() {
 					return
 				}
 			}
+			wg1 := sync.WaitGroup{}
 			for _, tab := range db.Tables {
-				tabname := tab.Name
-				cnt := tab.Cnt
-				if tab.Init {
-					err = initTable(cnDb, dbname, tabname)
-					if err != nil {
-						return
+				go func(tab *Table) {
+					wg1.Add(1)
+					defer wg1.Done()
+					tabname := tab.Name
+					cnt := tab.Cnt
+					if tab.Init { // init table
+						err = initTable(cnDb, dbname, tabname)
+						if err != nil {
+							return
+						}
+						err = initTable(usDb, dbname, tabname)
+						if err != nil {
+							return
+						}
+						err = initTable(ggDb, dbname, tabname)
+						if err != nil {
+							return
+						}
 					}
-					err = initTable(usDb, dbname, tabname)
-					if err != nil {
-						return
+					{ // insert data
+						wg2 := sync.WaitGroup{}
+						go func() {
+							wg2.Add(1)
+							defer wg2.Done()
+							err = insert(cnDb, dbname, tabname, CNStart, cnt, "cn")
+							if err != nil {
+								return
+							}
+						}()
+						go func() {
+							wg2.Add(1)
+							defer wg2.Done()
+							err = insert(usDb, dbname, tabname, USStart, cnt, "us")
+							if err != nil {
+								return
+							}
+						}()
+						wg2.Wait()
 					}
-					err = initTable(ggDb, dbname, tabname)
-					if err != nil {
-						return
-					}
-				}
-				{ // insert data
-					err = insert(cnDb, dbname, tabname, CNStart, cnt, "cn")
-					if err != nil {
-						return
-					}
-					err = insert(usDb, dbname, tabname, USStart, cnt, "us")
-					if err != nil {
-						return
-					}
-				}
+				}(tab)
 			}
+			wg1.Wait()
 		}
 	}
 

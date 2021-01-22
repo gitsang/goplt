@@ -1,0 +1,6 @@
+file:
+    filename: name_from_file
+    fileaddrs:
+      - file1.configor.com:80
+      - file2.configor.com:80
+      - file3.configor.com:80

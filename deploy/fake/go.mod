@@ -1,4 +1,4 @@
-module goplt/sql/fake
+module fake
 
 go 1.14
 

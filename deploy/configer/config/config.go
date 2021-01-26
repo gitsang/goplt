@@ -25,6 +25,10 @@ type Config struct {
 	Cfg struct {
 		IdOne int `cfgserver:"id_one"`
 		IdTwo int `cfgserver:"id_two"`
+		RegionList []struct{
+			Region string
+			DumpServer []string `json:"dump-server"`
+		} `cfgserver:"region_list"`
 	}
 }
 
@@ -33,6 +37,7 @@ var globalConfLock *sync.Mutex
 
 func init() {
 	globalConf = new(Config)
+	globalConfLock = new(sync.Mutex)
 }
 
 func LoadConfig(file string) error {

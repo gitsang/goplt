@@ -2,6 +2,7 @@ package CfgAgent
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"gitcode.yealink.com/server/server_framework/go-utils/ylog"
 	"go.uber.org/zap"
@@ -127,6 +128,7 @@ func processTags(config interface{}) error {
 			valueField = configValue.Field(i)
 			key = typeField.Tag.Get("cfgserver")
 		)
+		ylog.Debug("try load from cfgserver", zap.Any("key", key), zap.Any("kind", reflect.Indirect(valueField).Kind()))
 
 		if !valueField.CanAddr() || !valueField.CanInterface() {
 			continue
@@ -155,6 +157,18 @@ func processTags(config interface{}) error {
 					defer globalConfLock.Unlock()
 					vBool, _ := strconv.ParseBool(v)
 					valueField.Set(reflect.ValueOf(vBool))
+				})
+			case reflect.Slice:
+				fallthrough
+			case reflect.Struct:
+				ylog.Debug("read struct from cfgserver", zap.Any("key", key))
+				RegisterCallback(key, func(v string) {
+					globalConfLock.Lock()
+					defer globalConfLock.Unlock()
+					err := json.Unmarshal([]byte(v), valueField.Addr().Interface())
+					if err != nil {
+						ylog.Error("jsonUnmarshal failed", zap.Error(err))
+					}
 				})
 			}
 		}

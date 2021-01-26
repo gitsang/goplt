@@ -1,0 +1,4 @@
+cfgagent:
+  addr: cfgagent-cn.l7i.top:9438
+  app: configor
+  namespace: default

@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/jinzhu/configor"
 	"os"
+	"sync"
 	"testing"
 )
 
@@ -25,6 +26,7 @@ var cfg = struct {
 
 func TestConfigFromDefault(t *testing.T) {
 	cfg := struct {
+		sync.Mutex
 		Default struct {
 			Name     string   `default:"default_name"`
 			Addrs    []string `default:"[def1.cfg.com:80, def2.cfg.com:80, def3.cfg.com:80]"`
@@ -45,6 +47,8 @@ func TestConfigFromDefault(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
+	cfg.Lock()
+	cfg.Unlock()
 }
 
 func TestConfigFromEnv(t *testing.T) {

@@ -2,55 +2,40 @@ package main
 
 import (
 	"configor/config"
-	"github.com/pingcap/log"
+	CfgAgent "configor/config/cfgagent"
+	"gitcode.yealink.com/server/server_framework/go-utils/ylog"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"time"
 )
 
 func main() {
-	// 1. read config from file and environment
-	err := config.LoadConfig("")
+	err := ylog.InitYlog(ylog.Config{
+		Level:  zapcore.DebugLevel,
+		Stdout: ylog.LogStdoutConfig{
+			Enable: true,
+			Color:  true,
+		},
+	})
+
+	err = config.LoadConfig("main_test.yml")
 	if err != nil {
-		log.Error("load config from file failed", zap.Error(err))
+		ylog.Error("load config failed", zap.Error(err))
 	}
 
-	// 3. read config from cfgserver
-	// pretend to read
+	CfgAgent.RegisterCallback("id_one", func(v string) {
+		ylog.Info("my call back", zap.Any("v", v))
+	})
 
-	// 1. start server
-	//go func() {
-	//	testCfg.cond.L.Lock()
-	//	defer testCfg.cond.L.Unlock()
+	go func() {
+		for {
+			config.PrintConfig()
+			select {
+			case <-time.Tick(10 * time.Second):
+			}
+		}
+	}()
 
-	//	for {
-	//		fmt.Println("server 1", testCfg.Info.Id)
-	//		testCfg.cond.Wait()
-	//	}
-	//}()
-
-	//go func() {
-	//	testCfg.cond.L.Lock()
-	//	defer testCfg.cond.L.Unlock()
-
-	//	for {
-	//		fmt.Println("server 2", testCfg.Info.Id)
-	//		testCfg.cond.Wait()
-	//	}
-	//}()
-
-	// 1. listening config changed
-	//for {
-	//	select {
-	//	case <-time.Tick(10 * time.Second):
-	//	}
-
-	//	// pretend to receive config change
-	//	newConf := &TestConfig{
-	//		Name: "jsr",
-	//		Info: struct {
-	//			Id  int
-	//			Age int
-	//		}{Id:  time.Now().Second(), Age: 25},
-	//	}
-	//	testCfg.UpdateConfig(newConf)
-	//}
+	select {
+	}
 }

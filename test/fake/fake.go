@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/gitsang/golog"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/pingcap/log"
 	"go.uber.org/zap"
 	"sync"
 )
@@ -12,21 +12,22 @@ import (
 const (
 	Username   = "root"
 	Password   = ""
-	CnDB       = "tidb-cn.l7i.top"
-	UsDB       = "tidb-us.l7i.top"
-	GlobalDb   = "tidb-global.l7i.top"
+	CnDB       = "10.120.24.130"
+	UsDB       = "10.120.26.60"
+	EuDb       = "10.120.25.163"
 	DbHookPort = "9436"
 	Network    = "tcp"
 
 	CNStart = 100000000
 	USStart = 200000000
+	EuStart = 300000000
 )
 
 var cfg = Config{
 	Databases: []*Database{
 		{
 			Name: "sang",
-			Init: false,
+			Init: true,
 			Tables: []*Table{
 				{Name: "tab01", Cnt: 100000, Init: true},
 				{Name: "tab02", Cnt: 100000, Init: true},
@@ -88,7 +89,6 @@ func dropDatabase(db *sql.DB, dbname string) error {
 		log.Error("error", zap.Error(err))
 		return err
 	}
-	log.Info("success", zap.String("db", dbname))
 
 	return nil
 }
@@ -195,56 +195,56 @@ func initTable(db *sql.DB, dbname, tabname string) error {
 func main() {
 	var err error
 
-	log.Info("start")
+	log.Info("start...")
 	cnDb, err := dbConn(Username, Password, Network, CnDB, DbHookPort, "")
 	if err != nil {
-		log.Error("init cn conn failed", err.Error())
+		log.Error("init connection failed", zap.Any("region", "cn"), zap.Error(err))
 		return
 	} else {
-		log.Info("init cn conn success")
+		log.Info("init connection success", zap.Any("region", "cn"))
 	}
 	usDb, err := dbConn(Username, Password, Network, UsDB, DbHookPort, "")
 	if err != nil {
-		log.Error("init us conn failed", err.Error())
+		log.Error("init connection failed", zap.Any("region", "us"), zap.Error(err))
 		return
 	} else {
-		log.Info("init us conn success")
+		log.Info("init connection success", zap.Any("region", "us"))
 	}
-	ggDb, err := dbConn(Username, Password, Network, GlobalDb, DbHookPort, "")
+	euDb, err := dbConn(Username, Password, Network, EuDb, DbHookPort, "")
 	if err != nil {
-		log.Error("init gg conn failed", err.Error())
+		log.Error("init connection failed", zap.Any("region", "eu"), zap.Error(err))
 		return
 	} else {
-		log.Info("init gg conn success")
+		log.Info("init connection success", zap.Any("region", "eu"))
 	}
 
 	if true {
 		for _, db := range cfg.Databases {
 			dbname := db.Name
-			log.Info("start db", dbname)
+			log.Info("start database...", zap.Any("db", dbname))
 
 			// init db
 			if db.Init {
 				err = initDb(cnDb, dbname)
 				if err != nil {
-					log.Error("init cn db failed")
+					log.Error("init connection failed", zap.Any("region", "cn"), zap.Any("db", dbname), zap.Error(err))
 					return
 				} else {
-					log.Info("init cn db success")
+					log.Info("init connection failed", zap.Any("region", "cn"), zap.Any("db", dbname))
 				}
 				err = initDb(usDb, dbname)
 				if err != nil {
-					log.Error("init us db failed")
+					log.Error("init connection failed", zap.Any("region", "us"), zap.Any("db", dbname), zap.Error(err))
 					return
 				} else {
-					log.Info("init us db success")
+					log.Info("init connection failed", zap.Any("region", "us"), zap.Any("db", dbname))
 				}
-				err = initDb(ggDb, dbname)
+				err = initDb(euDb, dbname)
 				if err != nil {
-					log.Error("init gg db failed")
+					log.Error("init connection failed", zap.Any("region", "eu"), zap.Any("db", dbname), zap.Error(err))
 					return
 				} else {
-					log.Info("init gg db success")
+					log.Info("init connection failed", zap.Any("region", "eu"), zap.Any("db", dbname))
 				}
 			}
 
@@ -254,71 +254,74 @@ func main() {
 				tabname := tab.Name
 				cnt := tab.Cnt
 				init := tab.Init
-				log.Info("start tab", dbname, tabname)
+				log.Info("start table ...", zap.Any("table", dbname + "/" + tabname))
 
 				wg1.Add(1)
 				go func(tab *Table) {
 					defer wg1.Done()
 
-					log.Info("start tab init", dbname, tabname, init)
 					if init { // init table
 						err = initTable(cnDb, dbname, tabname)
 						if err != nil {
-							log.Error("init cn tab failed", dbname, tabname, err.Error())
+							log.Error("init table failed", zap.Any("region", "cn"), zap.Any("table", dbname + "/" + tabname), zap.Error(err))
 							return
 						} else {
-							log.Info("init cn tab success", dbname, tabname)
+							log.Info("init table success", zap.Any("region", "cn"), zap.Any("table", dbname + "/" + tabname))
 						}
 						err = initTable(usDb, dbname, tabname)
 						if err != nil {
-							log.Error("init us tab failed", dbname, tabname, err.Error())
+							log.Error("init table failed", zap.Any("region", "us"), zap.Any("table", dbname + "/" + tabname), zap.Error(err))
 							return
 						} else {
-							log.Info("init us tab success", dbname, tabname)
+							log.Info("init table success", zap.Any("region", "us"), zap.Any("table", dbname + "/" + tabname))
 						}
-						err = initTable(ggDb, dbname, tabname)
+						err = initTable(euDb, dbname, tabname)
 						if err != nil {
-							log.Error("init gg tab failed", dbname, tabname, err.Error())
+							log.Error("init table failed", zap.Any("region", "eu"), zap.Any("table", dbname + "/" + tabname), zap.Error(err))
 							return
 						} else {
-							log.Info("init gg tab success", dbname, tabname)
+							log.Info("init table success", zap.Any("region", "eu"), zap.Any("table", dbname + "/" + tabname))
 						}
 					}
 
-					log.Info("start tab insert", dbname, tabname, cnt)
+					log.Info("start table insert...", zap.Any("table", dbname + "/" + tabname), zap.Any("cnt", cnt))
 					{ // insert data
 						wg2 := sync.WaitGroup{}
 						wg2.Add(1)
 						go func() {
 							defer wg2.Done()
-
-							log.Info("start insert cn", dbname, tabname)
 							err = insert(cnDb, dbname, tabname, CNStart, cnt, "cn")
 							if err != nil {
-								log.Error("insert cn error", err.Error())
+								log.Error("insert failed", zap.Any("region", "cn"), zap.Any("table", dbname + "/" + tabname), zap.Error(err))
 								return
 							}
+							log.Info("insert success", zap.Any("region", "cn"), zap.Any("table", dbname + "/" + tabname))
 						}()
+						wg2.Add(1)
 						go func() {
-							wg2.Add(1)
 							defer wg2.Done()
-
-							log.Info("start insert us", dbname, tabname)
 							err = insert(usDb, dbname, tabname, USStart, cnt, "us")
 							if err != nil {
-								log.Error("insert us error", err.Error())
+								log.Error("insert failed", zap.Any("region", "us"), zap.Any("table", dbname + "/" + tabname), zap.Error(err))
 								return
 							}
+							log.Info("insert success", zap.Any("region", "us"), zap.Any("table", dbname + "/" + tabname))
+						}()
+						wg2.Add(1)
+						go func() {
+							defer wg2.Done()
+							err = insert(euDb, dbname, tabname, EuStart, cnt, "eu")
+							if err != nil {
+								log.Error("insert failed", zap.Any("region", "eu"), zap.Any("table", dbname + "/" + tabname), zap.Error(err))
+								return
+							}
+							log.Info("insert success", zap.Any("region", "eu"), zap.Any("table", dbname + "/" + tabname))
 						}()
 						wg2.Wait()
 					}
 				}(tab)
-
-				log.Info("insert data success", dbname, tabname)
 			}
 			wg1.Wait()
-
-			log.Info("finished db", dbname)
 		}
 	}
 
@@ -332,6 +335,10 @@ func main() {
 					return
 				}
 				err = Delete(usDb, dbname, tabname, USStart, USStart + 100)
+				if err != nil {
+					return
+				}
+				err = Delete(euDb, dbname, tabname, EuStart, EuStart + 100)
 				if err != nil {
 					return
 				}

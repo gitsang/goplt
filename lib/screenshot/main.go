@@ -24,13 +24,15 @@ func save(img *image.RGBA, filePath string) {
 	if err != nil {
 		log.Error("png encode failed", zap.Error(err))
 	}
+
+	log.Info("save image success", zap.String("path", filePath))
 }
 
 func genImgName(prefix string) string {
 	now := time.Now()
 	year, month, day := now.Date()
 	hour, min, sec := now.Clock()
-	return fmt.Sprintf("screenshot-%s-%d%d%d-%d%d%d.png", prefix, year, month, day, hour, min, sec)
+	return fmt.Sprintf("screenshot-%s-%04d%02d%02d-%02d%02d%02d.png", prefix, year, month, day, hour, min, sec)
 }
 
 func screenshotCustomize(x, y, w, h int) {
@@ -51,6 +53,7 @@ func screenshotAll() {
 		img, err := screenshot.CaptureDisplay(i)
 		if err != nil {
 			log.Error("screenshot failed", zap.Error(err))
+			continue
 		}
 		save(img, genImgName(fmt.Sprintf("screen%d", i)))
 	}
@@ -82,12 +85,13 @@ func screenshotUnion() {
 }
 
 func main() {
+	log.InitLogger(log.WithLogFile("screenshot.log"))
+
 	for {
 		select {
-		case <-time.Tick(10 * time.Second):
+		case <-time.Tick(60 * time.Second):
 		}
 
 		screenshotAll()
-		log.Info("screenshot success")
 	}
 }

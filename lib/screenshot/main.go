@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"image"
 	"image/png"
 	"os"
 	"time"
 
+	"github.com/gitsang/golog"
 	"github.com/kbinani/screenshot"
 )
 
@@ -14,10 +16,14 @@ import (
 func save(img *image.RGBA, filePath string) {
 	file, err := os.Create(filePath)
 	if err != nil {
-		panic(err)
+		log.Error("save failed", zap.Error(err))
 	}
 	defer func() { _ = file.Close() }()
-	_ = png.Encode(file, img)
+
+	err = png.Encode(file, img)
+	if err != nil {
+		log.Error("png encode failed", zap.Error(err))
+	}
 }
 
 func genImgName(prefix string) string {
@@ -38,13 +44,13 @@ func screenshotCustomize(x, y, w, h int) {
 func screenshotAll() {
 	n := screenshot.NumActiveDisplays()
 	if n <= 0 {
-		panic("没有发现活动的显示器")
+		log.Error("no active displays")
 	}
 
 	for i := 0; i < n; i++ {
 		img, err := screenshot.CaptureDisplay(i)
 		if err != nil {
-			panic(err)
+			log.Error("screenshot failed", zap.Error(err))
 		}
 		save(img, genImgName(fmt.Sprintf("screen%d", i)))
 	}
@@ -63,7 +69,7 @@ func screenshotBounds(idx int) {
 	bounds := screenshot.GetDisplayBounds(idx)
 	img, err := screenshot.CaptureRect(bounds)
 	if err != nil {
-		panic(err)
+		log.Error("screenshotBounds failed", zap.Error(err))
 	}
 	save(img, genImgName("bounds"))
 }
@@ -82,6 +88,6 @@ func main() {
 		}
 
 		screenshotAll()
-		fmt.Println("screenshot success")
+		log.Info("screenshot success")
 	}
 }

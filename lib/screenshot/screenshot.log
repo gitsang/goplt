@@ -1,0 +1,3 @@
+2021-05-13T14:52:22.010+0800	INFO	screenshot/main.go:78	config	{"logPath": "screenshot.log", "interval": 60000}
+2021-05-13T14:52:23.351+0800	INFO	screenshot/main.go:41	save image success	{"path": "screenshot-20210513/screen0-20210513-145222.png"}
+2021-05-13T14:52:23.884+0800	INFO	screenshot/main.go:41	save image success	{"path": "screenshot-20210513/screen1-20210513-145223.png"}

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"go.uber.org/zap"
 	"image"
 	"image/png"
 	"os"
+	"path"
 	"time"
 
 	"github.com/gitsang/golog"
@@ -14,13 +16,24 @@ import (
 
 // save *image.RGBA to filePath with PNG format.
 func save(img *image.RGBA, filePath string) {
+	dir := path.Dir(filePath)
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		log.Error("mkdir failed", zap.Error(err))
+		return
+	}
+
 	file, err := os.Create(filePath)
 	if err != nil {
-		log.Error("save failed", zap.Error(err))
+		log.Error("create failed", zap.Error(err))
 	}
 	defer func() { _ = file.Close() }()
 
-	err = png.Encode(file, img)
+	encoder := png.Encoder{
+		CompressionLevel: png.BestCompression,
+		BufferPool:       nil,
+	}
+	err = encoder.Encode(file, img)
 	if err != nil {
 		log.Error("png encode failed", zap.Error(err))
 	}
@@ -28,19 +41,13 @@ func save(img *image.RGBA, filePath string) {
 	log.Info("save image success", zap.String("path", filePath))
 }
 
-func genImgName(prefix string) string {
+func genImgPath(prefix string) string {
 	now := time.Now()
 	year, month, day := now.Date()
 	hour, min, sec := now.Clock()
-	return fmt.Sprintf("screenshot-%s-%04d%02d%02d-%02d%02d%02d.png", prefix, year, month, day, hour, min, sec)
-}
-
-func screenshotCustomize(x, y, w, h int) {
-	img, err := screenshot.Capture(x, y, w, h)
-	if err != nil {
-		panic(err)
-	}
-	save(img, genImgName("customize"))
+	dir := fmt.Sprintf("screenshot-%04d%02d%02d", year, month, day)
+	file := fmt.Sprintf("%s-%04d%02d%02d-%02d%02d%02d.png", prefix, year, month, day, hour, min, sec)
+	return path.Join(dir, file)
 }
 
 func screenshotAll() {
@@ -55,43 +62,25 @@ func screenshotAll() {
 			log.Error("screenshot failed", zap.Error(err))
 			continue
 		}
-		save(img, genImgName(fmt.Sprintf("screen%d", i)))
+		save(img, genImgPath(fmt.Sprintf("screen%d", i)))
 	}
-}
-
-func screenshotRectangle(x0, y0, x1, y1 int)  {
-	rect := image.Rect(x0, y0, x1, y1)
-	img, err := screenshot.CaptureRect(rect)
-	if err != nil {
-		panic(err)
-	}
-	save(img, genImgName("rectangle"))
-}
-
-func screenshotBounds(idx int) {
-	bounds := screenshot.GetDisplayBounds(idx)
-	img, err := screenshot.CaptureRect(bounds)
-	if err != nil {
-		log.Error("screenshotBounds failed", zap.Error(err))
-	}
-	save(img, genImgName("bounds"))
-}
-
-func screenshotUnion() {
-	all := image.Rect(0, 0, 0, 0)
-	bounds := screenshot.GetDisplayBounds(0)
-	all = bounds.Union(all)
-	fmt.Println(all.Min.X, all.Min.Y, all.Dx(), all.Dy())
 }
 
 func main() {
-	log.InitLogger(log.WithLogFile("screenshot.log"))
+	logPathPtr := flag.String("logPath", "screenshot.log", "")
+	intervalPtr := flag.Int64("interval", 10, "minute")
+	flag.Parse()
 
+	logPath := *logPathPtr
+	interval := time.Duration(*intervalPtr) * time.Minute
+	log.InitLogger(log.WithLogFile(logPath))
+
+	log.Info("config", zap.String("logPath", logPath), zap.Any("interval", interval))
 	for {
-		select {
-		case <-time.Tick(60 * time.Second):
-		}
-
 		screenshotAll()
+
+		select {
+		case <-time.Tick(interval):
+		}
 	}
 }

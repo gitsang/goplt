@@ -41,16 +41,16 @@ func save(img *image.RGBA, filePath string) {
 	log.Info("save image success", zap.String("path", filePath))
 }
 
-func genImgPath(prefix string) string {
+func genImgPath(savePath, prefix string) string {
 	now := time.Now()
 	year, month, day := now.Date()
 	hour, min, sec := now.Clock()
 	dir := fmt.Sprintf("screenshot-%04d%02d%02d", year, month, day)
 	file := fmt.Sprintf("%s-%04d%02d%02d-%02d%02d%02d.png", prefix, year, month, day, hour, min, sec)
-	return path.Join(dir, file)
+	return path.Join(savePath, dir, file)
 }
 
-func screenshotAll() {
+func screenshotAll(savePath string) {
 	n := screenshot.NumActiveDisplays()
 	if n <= 0 {
 		log.Error("no active displays")
@@ -62,22 +62,26 @@ func screenshotAll() {
 			log.Error("screenshot failed", zap.Error(err))
 			continue
 		}
-		save(img, genImgPath(fmt.Sprintf("screen%d", i)))
+		prefix := fmt.Sprintf("screen%d", i)
+		save(img, genImgPath(savePath, prefix))
 	}
 }
 
 func main() {
-	logPathPtr := flag.String("logPath", "screenshot.log", "")
-	intervalPtr := flag.Int64("interval", 10, "minute")
+	savePathPtr := flag.String("s", "", "save path")
+	logPathPtr := flag.String("l", "screenshot.log", "log path")
+	intervalPtr := flag.Int64("i", 10, "interval(minute)")
 	flag.Parse()
 
+	savePath := *savePathPtr
 	logPath := *logPathPtr
 	interval := time.Duration(*intervalPtr) * time.Minute
 	log.InitLogger(log.WithLogFile(logPath))
 
-	log.Info("config", zap.String("logPath", logPath), zap.Any("interval", interval))
+	log.Info("config", zap.String("savePath", savePath),
+		zap.String("logPath", logPath), zap.Any("interval", interval))
 	for {
-		screenshotAll()
+		screenshotAll(savePath)
 
 		select {
 		case <-time.Tick(interval):

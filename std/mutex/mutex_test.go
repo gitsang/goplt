@@ -40,3 +40,13 @@ func TestRWMutex(t *testing.T) {
 
 	select {}
 }
+
+func TestUnlock(t *testing.T) {
+	var mtx sync.Mutex
+	mtx.Lock()
+	t.Log("lock")
+	mtx.Unlock()
+	t.Log("unlock once")
+	mtx.Unlock()
+	t.Log("unlock twice")
+}

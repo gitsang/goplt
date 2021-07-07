@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocketClient</title>
+</head>
+
+<body>
+    <form action="<?php $_PHP_SELF ?>" method="post">
+        <h4>ts&nbsp;: <input type="text" name="ts" value="<?php if(isset($_POST['ts'])) { echo $_POST['ts']; } else { echo getMillisecond(); } ?>"> <input type="submit" value="convert"></h4>
+        <h4>tm&nbsp;: <?php if(isset($_POST['ts'])) { echo ts_to_date($_POST["ts"]); } else { echo ts_to_date(getMillisecond()); } ?></h4>
+    </form>
+</body>
+
+<script type="text/javascript" src="WebSocketClient.js"></script>
+
+<script>
+    function
+
+    let recvCnt = 0;
+    let sendCnt = 0;
+    let handler = {
+        onConnect:function (e) {
+            console.log("handler connect success ", e);
+            let task = setInterval(function () {
+                if (socket.isOpen() === false) {
+                    clearInterval(task);
+                }
+
+                sendCnt++;
+                let message = "web browser hello " + Date.now();
+                socket.send(message);
+                console.log("send message ", message, sendCnt);
+            }, 10000)
+        },
+
+        onDisconnect:function (e) {
+            console.log("websocket disconnect ", e);
+        },
+
+        onMsg:function (data) {
+            recvCnt++;
+            console.log("receive message ", data, recvCnt)
+        }
+    };
+
+    let socket = new WebSocketClient.EngineSocket("ws://127.0.0.1:10081/ws", handler);
+</script>
+
+</html>

@@ -9,7 +9,6 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/opentracing/opentracing-go v1.1.0 // indirect
 	github.com/prometheus/client_golang v1.11.1
-	github.com/stretchr/testify v1.6.1 // indirect
 	golang.org/x/net v0.17.0
-	google.golang.org/grpc v1.34.1
+	google.golang.org/grpc v1.56.3
 )

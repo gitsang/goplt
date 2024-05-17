@@ -9,7 +9,7 @@ fi
 
 decrypted_file_path=${2}
 if [ -z "${decrypted_file_path}" ]; then
-    decrypted_file_path="${encrypted_file_path%.*}.ecrypted"
+    decrypted_file_path="${encrypted_file_path%.*}.decrypted"
 fi
 
 fingerprint=$(gpg --import ${secret_key_path} 2>&1 | grep -oP '\b[0-9A-F]{16}\b')

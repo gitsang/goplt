@@ -13,9 +13,9 @@ if [ -z "${public_key}" ]; then
     read -p "Enter the public key: " public_key
 fi
 
-passphrase=$(openssl rand -base64 32)
+echo "Encrypting ${encrypt_file_path} to ${encrypted_file_path} with public key ${public_key}"
 
-echo "Encrypting ${encrypt_file_path} to ${encrypted_file_path} with passphrase ${passphrase} and public key ${public_key}"
+passphrase=$(openssl rand -base64 32)
 
 pv < ${encrypt_file_path} | \
     openssl enc -e -a -salt -k ${passphrase} | \

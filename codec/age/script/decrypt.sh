@@ -7,10 +7,13 @@ fi
 
 decrypted_file_path=${2}
 if [ -z "${decrypted_file_path}" ]; then
-    decrypted_file_path="${encrypted_file_path%.*}.decrypted"
+    decrypted_file_path=${encrypted_file_path%.age}
 fi
 
-key_file=${3:-./key.age}
+private_key=${3:-./key.age}
+
+echo "Decrypting ${encrypted_file_path} to ${decrypted_file_path} with private key ${private_key}"
 
 pv < ${encrypted_file_path} | \
-    age -d -i ${key_file} > ${decrypted_file_path}
+    age -d -i ${private_key} | \
+    dd of=${decrypted_file_path}

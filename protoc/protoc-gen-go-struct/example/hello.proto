@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package example.v1;
+
+option go_package = ".";
+
+// User represents a single user.
+message User {
+  // name of the user
+  string name = 1; // length must be 1 or greater
+  // age of the user
+  int64 age = 2; // must be greater than 0
+}

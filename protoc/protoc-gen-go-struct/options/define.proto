@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package protoc_gen_go_struct.options;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "protoc-gen-go-struct/options";
+
+message Info {
+  string app = 1;
+  string version = 2;
+  string description = 3;
+}
+
+message APIDefine {
+  Info info = 1;
+}
+
